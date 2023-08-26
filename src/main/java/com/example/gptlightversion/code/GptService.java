@@ -98,7 +98,7 @@ public class GptService {
                 .version(HTTP_2)
                 .header("Content-Type", "application/json")
                 .header("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0")
-                .header("Authorization", "Bearer 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")
+                .header("Authorization", "Bearer ")
                 .POST(HttpRequest.BodyPublishers.ofString(requestTemplate))
                 .uri(new URI("https://api.openai.com/v1/chat/completions"))
 

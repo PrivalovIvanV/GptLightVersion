@@ -8,6 +8,7 @@ import org.jline.utils.Log
 import org.springframework.stereotype.Component
 import java.io.File
 import java.io.FileInputStream
+import java.util.regex.Pattern
 
 @Component
 @Slf4j
@@ -16,11 +17,14 @@ class MyConverter(var writer: FileWriter) {
 
     fun convertDocxToTxt(file: File, outputFolder: File = File("${file.parentFile.path}\\convert")): Boolean {
         return try {
+            val pattern = Regex("[^А-я\\n \\d()A-z.\"'«»,:\\\\—-]")
             val s = readDocx(file)
+                .replace(pattern, "")
+                .replace(Regex("\\\\"), "")
             val number = file.extractNumber()
             val newFile = File("${outputFolder.path}\\$number.txt")
-            if (!newFile.exists())
-                newFile.mkdirs()
+            if (!outputFolder.exists())
+                outputFolder.mkdirs()
             writer.write(s, newFile)
             true
         } catch (e: NoSuchFieldException) {

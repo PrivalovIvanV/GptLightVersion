@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -33,6 +34,8 @@ import static java.net.http.HttpClient.Version.HTTP_2;
 public class GptService {
 
     private final FileWriter writer;
+    @Value("${ai.key}")
+    private String token;
     private final HttpClient client = HttpClient.newBuilder()
             .version(HTTP_2)
             .build();
@@ -98,7 +101,7 @@ public class GptService {
                 .version(HTTP_2)
                 .header("Content-Type", "application/json")
                 .header("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0")
-                .header("Authorization", "Bearer ")
+                .header("Authorization", "Bearer " + token)
                 .POST(HttpRequest.BodyPublishers.ofString(requestTemplate))
                 .uri(new URI("https://api.openai.com/v1/chat/completions"))
 

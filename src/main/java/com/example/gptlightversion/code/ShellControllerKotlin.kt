@@ -1,9 +1,11 @@
 package com.example.gptlightversion.code
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellOption
 import java.io.File
+import java.util.Comparator
 
 
 @ShellComponent
@@ -13,7 +15,8 @@ class ShellControllerKotlin(
         val ai: GptService
 ) {
 
-    private val defaultRequest = "Исправь грамматические ошибки, убери переносы и лишние знаки и пробелы"
+    @Value("\${ai.default-request}")
+    private lateinit var defaultRequest : String
     @ShellMethod(key = ["transcode"], value = "Transcode files from UTF-16")
     fun transcode(@ShellOption("-F") pathToFolder: String,
                   @ShellOption("-f") pathToFile: String): String {
@@ -89,7 +92,12 @@ class ShellControllerKotlin(
             file.listFiles()?.forEach {
                 converter.convertDocxToTxt(file = it, folderForGpt)
             }
-            folderForGpt.listFiles()?.forEach {
+            folderForGpt.listFiles().toMutableList()
+                .stream()
+                .sorted { o1, o2 ->
+                    return@sorted if (o1.extractNumber() > o2.extractNumber()) 1 else -1
+                }
+                .forEach {
                 ai.chatGpt(it, defaultRequest)
             }
             transcoder.encodeFolder(folderForGpt.path)
